@@ -111,7 +111,7 @@ class MyHomePageState extends State<MyHomePage> {
             // ),
             Expanded(
               child: RepaintBoundary(
-                key: UniqueKey(),
+                key: Key(selectedCollageType?.toString() ?? ''),
                 child: ImageCollageWidget(
                   collageType: selectedCollageType ?? CollageType.values.first,
                   withImage: true,
