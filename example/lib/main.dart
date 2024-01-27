@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:image_collage_widget/utils/collage_type.dart';
+import 'package:image_collage_widget/model/college_type.dart';
 
 import 'src/screens/collage_sample.dart';
 import 'src/tranistions/fade_route_transition.dart';
