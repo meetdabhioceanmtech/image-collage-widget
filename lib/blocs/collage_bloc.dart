@@ -181,7 +181,6 @@ class CollageBloc extends Bloc<CollageEvent, CollageState> {
       images.id = i + 1;
       imageList.add(images);
     }
-
     return imageList;
   }
 

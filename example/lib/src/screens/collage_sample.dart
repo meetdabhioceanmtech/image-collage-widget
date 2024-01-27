@@ -69,6 +69,7 @@ class _CollageSample extends State<CollageSample> {
             child: ImageCollageWidget(
               collageType: widget.collageType,
               withImage: true,
+              isDisabled: false,
             ),
           ),
           if (_startLoading)

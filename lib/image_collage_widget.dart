@@ -15,12 +15,14 @@ class ImageCollageWidget extends StatefulWidget {
   final String? filePath;
   final CollageType collageType;
   final bool withImage;
+  final bool isDisabled;
 
   const ImageCollageWidget({
     super.key,
     this.filePath,
     required this.collageType,
     required this.withImage,
+    required this.isDisabled,
   });
 
   @override
@@ -40,7 +42,6 @@ class _ImageCollageWidget extends State<ImageCollageWidget> with WidgetsBindingO
 
     WidgetsBinding.instance.addObserver(this);
     _imageListBloc = CollageBloc(context: context, path: _filePath, collageType: _collageType);
-    _imageListBloc.add(ImageListEvent(_imageListBloc.blankList()));
     _imageListBloc.add(ImageListEvent(_imageListBloc.blankList()));
   }
 
@@ -83,9 +84,7 @@ class _ImageCollageWidget extends State<ImageCollageWidget> with WidgetsBindingO
           if (state is ImageListState) {
             return _gridView();
           }
-          return Container(
-            color: Colors.green,
-          );
+          return const SizedBox.shrink();
         },
       ),
     );
@@ -98,7 +97,12 @@ class _ImageCollageWidget extends State<ImageCollageWidget> with WidgetsBindingO
   Widget _gridView() {
     return AspectRatio(
       aspectRatio: 1.0 / 1.0,
-      child: GridCollageWidget(_collageType, _imageListBloc, context),
+      child: GridCollageWidget(
+        context,
+        collageType: _collageType,
+        imageListBloc: _imageListBloc,
+        isDisabled: widget.isDisabled,
+      ),
     );
   }
 }
