@@ -1,21 +1,29 @@
-// ignore_for_file: invalid_use_of_visible_for_testing_member, deprecated_member_use
-
 import 'dart:io';
 import 'dart:math';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_collage_widget/model/college_type.dart';
-import 'package:image_collage_widget/model/images.dart';
 import 'package:image_collage_widget/utils/permission_type.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:test_package/model/image_model.dart';
 part 'collage_cubit_state.dart';
 
-class CollageCubit extends Cubit<CollageCubitState> {
-  // CollageType collageType = CollageType.values.first;
-  // String path = '';
+enum CollageType {
+  vSplit,
+  hSplit,
+  fourSquare,
+  nineSquare,
+  threeVertical,
+  leftBig,
+  rightBig,
+  threeHorizontal,
+  fourLeftBig,
+  vMiddleTwo,
+  centerBig
+}
 
+enum ImageSource { camera, gallery }
+
+class CollageCubit extends Cubit<CollageCubitState> {
   CollageCubit() : super(CollageCubitInitial());
 
   void inistall({required CollageType selectedCollageType}) {
@@ -45,7 +53,7 @@ class CollageCubit extends Cubit<CollageCubitState> {
     required CollageType selectedCollageType,
     required ImageListState state,
   }) async {
-    PickedFile? image = await ImagePicker.platform.pickImage(
+    XFile? image = await ImagePicker().pickImage(
       source: permissionType == PermissionType.storage
           ? ImageSource.gallery
           : ImageSource.camera,
@@ -133,37 +141,6 @@ class CollageCubit extends Cubit<CollageCubitState> {
     }
     return 0;
   }
-
-  // Future loadImages(String path, int maxCount) async {
-  //   var path = await FilePicker.platform.getDirectoryPath();
-  //   var root = Directory(path ?? '$path/DCIM/Camera');
-
-  //   await root.exists().then((isExist) async {
-  //     int maxImage = maxCount;
-  //     var listImage = blankList();
-  //     if (isExist) {
-  //       FilePickerResult? result = await FilePicker.platform.pickFiles(
-  //         type: FileType.custom,
-  //         allowedExtensions: ['jpeg', 'png', 'jpg'],
-  //       );
-
-  //       List<File> files = result!.paths.map((path) => File(path ?? '')).toList();
-  //       debugPrint('file length---> ${files.length}');
-
-  //       /// [file] by default will return old images.
-  //       /// for getting latest max number of photos [file.sublist(file.length - maxImage, file.length)]
-
-  //       List<File> filesList =
-  //           files.length > maxImage ? files.sublist(files.length - (maxImage + 1), files.length - 1) : files;
-
-  //       for (int i = 0; i < filesList.length; i++) {
-  //         listImage[i].imageUrl = File(filesList[i].path);
-  //       }
-  //     }
-
-  //     add(ImageListEvent(listImage));
-  //   });
-  // }
 
   int getCellCount({
     required int index,

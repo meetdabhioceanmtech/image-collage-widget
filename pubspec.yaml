@@ -11,13 +11,14 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_staggered_grid_view: ^0.4.1
-  flutter_bloc: ^8.1.3
-  file_manager: ^1.0.2
-  file_picker: ^6.1.1
-  permission_handler: ^11.2.0
-  image_picker: ^1.0.7
-  equatable: ^2.0.5
+  # flutter_staggered_grid_view: ^0.4.1
+  # flutter_bloc: ^8.1.3
+  # file_manager: ^1.0.2
+  # file_picker: ^6.1.1
+  # permission_handler: ^11.2.0
+  # image_picker: ^1.0.7
+  # equatable: ^2.0.5
+  # image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:
@@ -29,9 +30,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   assets:
-  - assets/icons/permission_denied.png
+    - assets/icons/permission_denied.png
   # To add assets to your package, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

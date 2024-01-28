@@ -1,13 +1,14 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:image_collage_widget/model/college_type.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_collage_widget/model/images.dart';
-import 'package:image_collage_widget/utils/permission_type.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:test_package/cubit/collage_cubit_cubit.dart';
+import 'package:test_package/model/image_model.dart';
 
 void main() {
   BlocOverrides.runZoned(
@@ -57,7 +58,7 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   var color = Colors.white;
-  // final GlobalKey _screenshotKey = GlobalKey();
+  ScreenshotController screenshotController = ScreenshotController();
   late CollageCubit collageCubit;
 
   @override
@@ -79,14 +80,13 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         bloc: collageCubit,
         builder: (context, state) {
           if (state is ImageListState) {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
+            return SingleChildScrollView(
               child: Column(
                 children: [
-                  Expanded(
-                    child: AspectRatio(
-                      aspectRatio: 1.0,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Screenshot(
+                      controller: screenshotController,
                       child: gridShow(
                         state: state,
                         images: state.allImageSave[
@@ -99,18 +99,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       ),
                     ),
                   ),
-                  // Expanded(
-                  //   child: RepaintBoundary(
-                  //     key: Key(selectedCollageType?.toString() ?? ''),
-                  //     child: GridCollageWidget(
-                  //       isDisabled: false,
-                  //       collageType:
-                  //           selectedCollageType ?? CollageType.values.first,
-                  //       imageList: state.images,
-                  //       imagePiker: imagePickerDialog(index, context),
-                  //     ),
-                  //   ),
-                  // ),
+                  const SizedBox(height: 30),
                   bottomRowList(state)
                 ],
               ),
@@ -119,6 +108,33 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             return const SizedBox();
           }
         },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await screenshotController.capture().then(
+            (value) async {
+              var snackBar;
+              if (value != null) {
+                var isDone = await ImageGallerySaver.saveImage(
+                  Uint8List.fromList(value),
+                  quality: 100,
+                );
+                if (isDone != null) {
+                  snackBar = const SnackBar(
+                    content: Text('File saved successfully'),
+                  );
+                } else {
+                  snackBar = const SnackBar(
+                    content: Text('Can\'t save the file? Try again.'),
+                  );
+                }
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              }
+            },
+          );
+        },
+        child: const Icon(Icons.save),
       ),
     );
   }
@@ -235,44 +251,47 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     required List<Images> imageList,
     required ImageListState state,
   }) {
-    return Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        Positioned.fill(
-          bottom: 0.0,
-          child: Padding(
-            padding: const EdgeInsets.all(3),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
-              child: imageList[index].imageUrl != null && !isDisabled
-                  ? Image.file(
-                      imageList[index].imageUrl ?? File(''),
-                      fit: BoxFit.cover,
-                    )
-                  : Container(
-                      color: const Color(0xFFD3D3D3),
-                      child: isDisabled ? null : const Icon(Icons.add),
-                    ),
-            ),
-          ),
-        ),
-        if (!isDisabled)
+    return Container(
+      color: Colors.white,
+      child: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
           Positioned.fill(
-            child: Material(
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
-              color: Colors.transparent,
-              child: InkWell(
-                highlightColor: Colors.transparent,
-                onTap: () => showImagePickerDialog(
-                  index: index,
-                  context: context,
-                  imageList: imageList,
-                  state: state,
-                ),
+            bottom: 0.0,
+            child: Padding(
+              padding: const EdgeInsets.all(3),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
+                child: imageList[index].imageUrl != null && !isDisabled
+                    ? Image.file(
+                        imageList[index].imageUrl ?? File(''),
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        color: const Color(0xFFD3D3D3),
+                        child: isDisabled ? null : const Icon(Icons.add),
+                      ),
               ),
             ),
           ),
-      ],
+          if (!isDisabled)
+            Positioned.fill(
+              child: Material(
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
+                color: Colors.transparent,
+                child: InkWell(
+                  highlightColor: Colors.transparent,
+                  onTap: () => showImagePickerDialog(
+                    index: index,
+                    context: context,
+                    imageList: imageList,
+                    state: state,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -293,24 +312,23 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 buildDialogOption(
-                  index: index,
-                  isForStorage: false,
-                  context: context,
-                  state: state,
-                ),
+                    index: index,
+                    isForStorage: false,
+                    context: context,
+                    state: state,
+                    permissionType: PermissionType.camera),
                 buildDialogOption(
-                  index: index,
-                  isForStorage: true,
-                  context: context,
-                  state: state,
-                ),
+                    index: index,
+                    isForStorage: true,
+                    context: context,
+                    state: state,
+                    permissionType: PermissionType.gallery),
                 imageList[index].imageUrl != null
                     ? buildDialogOption(
                         context: context,
                         index: index,
-                        isForRemovePhoto: true,
                         state: state,
-                      )
+                        permissionType: PermissionType.removeImage)
                     : Container(),
               ],
             ),
@@ -324,14 +342,14 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   buildDialogOption({
     required int index,
     bool isForStorage = true,
-    bool isForRemovePhoto = false,
     required BuildContext context,
     required ImageListState state,
+    required PermissionType permissionType,
   }) {
     return TextButton(
       onPressed: () {
         Navigator.of(context, rootNavigator: true).pop(true);
-        isForRemovePhoto
+        permissionType == PermissionType.removeImage
             ? collageCubit.dispatchRemovePhotoEvent(
                 state: state,
                 index: index,
@@ -340,9 +358,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             : collageCubit.openPicker(
                 state: state,
                 selectedCollageType: state.selectedCollageType,
-                permissionType: isForStorage
-                    ? PermissionType.storage
-                    : PermissionType.camera,
+                permissionType: permissionType,
                 index: index,
               );
       },
@@ -354,12 +370,12 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             Padding(
               padding: const EdgeInsets.only(right: 16),
               child: Icon(
-                isForRemovePhoto
+                permissionType == PermissionType.removeImage
                     ? Icons.clear
                     : isForStorage
                         ? Icons.photo_album
                         : Icons.add_a_photo,
-                color: isForRemovePhoto
+                color: permissionType == PermissionType.removeImage
                     ? Colors.red
                     : isForStorage
                         ? Colors.amber
@@ -367,7 +383,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               ),
             ),
             Text(
-              isForRemovePhoto
+              permissionType == PermissionType.removeImage
                   ? "Remove"
                   : isForStorage
                       ? "Gallery"
