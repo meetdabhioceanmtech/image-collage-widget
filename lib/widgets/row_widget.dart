@@ -3,67 +3,63 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:image_collage_widget/cubit/collage_cubit_cubit.dart';
 import 'package:image_collage_widget/model/college_type.dart';
-import 'package:image_collage_widget/utils/permission_type.dart';
+import 'package:image_collage_widget/model/images.dart';
 
 class GridCollageWidget extends StatelessWidget {
   final CollageType collageType;
-  final CollageCubit collageCubit;
+  final List<Images> imageList;
   final bool isDisabled;
-  BuildContext _context;
-
-  GridCollageWidget(
-    this._context, {
-    super.key,
+  final VoidCallback imagePiker;
+  const GridCollageWidget({
+    super.key, // Use the key parameter directly
     required this.collageType,
-    required this.collageCubit,
     required this.isDisabled,
+    required this.imageList,
+    required this.imagePiker,
   });
 
   @override
   Widget build(BuildContext context) {
-    _context = context;
-    return BlocBuilder<CollageCubit, CollageCubitState>(
-      bloc: collageCubit,
-      builder: (context, state) {
-        if (state is ImageListState) {
-          return StaggeredGridView.countBuilder(
-            shrinkWrap: false,
-            itemCount: state.images.length,
-            crossAxisCount: getCrossAxisCount(collageType),
-            primary: true,
-            itemBuilder: (BuildContext context, int index) {
-              return buildRow(
-                index: index,
-                isDisabled: isDisabled,
-              );
-            },
-            staggeredTileBuilder: (int index) => StaggeredTile.count(
-              getCellCount(
-                index: index,
-                isForCrossAxis: true,
-                type: collageType,
-              ),
-              double.parse(
-                getCellCount(
-                  index: index,
-                  isForCrossAxis: false,
-                  type: collageType,
-                ).toString(),
-              ),
-            ),
-          );
-        }
-        return const SizedBox.shrink();
+    return StaggeredGridView.countBuilder(
+      shrinkWrap: false,
+      itemCount: imageList.length,
+      crossAxisCount: getCrossAxisCount(collageType, 0, context),
+      primary: true,
+      itemBuilder: (BuildContext context, int index) {
+        return buildRow(
+          index: index,
+          isDisabled: isDisabled,
+          context: context,
+        );
       },
+      staggeredTileBuilder: (int index) => StaggeredTile.count(
+        getCellCount(
+          index: index,
+          isForCrossAxis: true,
+          type: collageType,
+        ),
+        double.parse(
+          getCellCount(
+            index: index,
+            isForCrossAxis: false,
+            type: collageType,
+          ).toString(),
+        ),
+      ),
     );
   }
 
   ///Find cross axis count for arrange items to Grid
-  getCrossAxisCount(CollageType type) {
+  int getCrossAxisCount(CollageType type, int gridIndex, BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    int baseCount = (screenWidth / 100)
+        .floor(); // Adjust the base item width (100) as needed
+    int crossAxisCount = baseCount + gridIndex;
+    crossAxisCount = crossAxisCount < 2 ? 2 : crossAxisCount;
+
+    // Use crossAxisCount based on collage type
     if (type == CollageType.hSplit ||
         type == CollageType.vSplit ||
         type == CollageType.threeHorizontal ||
@@ -77,151 +73,161 @@ class GridCollageWidget extends StatelessWidget {
       return 3;
     } else if (type == CollageType.fourLeftBig) {
       return 3;
-    } else if (type == CollageType.vMiddleTwo || type == CollageType.centerBig) {
+    } else if (type == CollageType.vMiddleTwo ||
+        type == CollageType.centerBig) {
       return 12;
     }
+
+    return crossAxisCount;
   }
 
   ///Build UI either image is selected or not
-  buildRow({required int index, required bool isDisabled}) {
-    return BlocBuilder<CollageCubit, CollageCubitState>(
-      bloc: collageCubit,
-      builder: (context, state) {
-        if (state is ImageListState) {
-          return Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              Positioned.fill(
-                bottom: 0.0,
-                child: Padding(
-                  padding: const EdgeInsets.all(3),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                    child: state.images[index].imageUrl != null
-                        ? Image.file(
-                            state.images[index].imageUrl ?? File(''),
-                            fit: BoxFit.cover,
-                          )
-                        : Container(
-                            color: const Color(0xFFD3D3D3),
-                            child: isDisabled ? null : const Icon(Icons.add),
-                          ),
-                  ),
-                ),
-              ),
-              if (!isDisabled)
-                Positioned.fill(
-                  child: Material(
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                    color: Colors.transparent,
-                    child: InkWell(
-                      highlightColor: Colors.transparent,
-                      onTap: () => imagePickerDialog(index),
+  buildRow({
+    required int index,
+    required bool isDisabled,
+    required BuildContext context,
+  }) {
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        Positioned.fill(
+          bottom: 0.0,
+          child: Padding(
+            padding: const EdgeInsets.all(3),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              child: imageList[index].imageUrl != null
+                  ? Image.file(
+                      imageList[index].imageUrl ?? File(''),
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      color: const Color(0xFFD3D3D3),
+                      child: isDisabled ? null : const Icon(Icons.add),
                     ),
-                  ),
-                ),
-            ],
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
+            ),
+          ),
+        ),
+        if (!isDisabled)
+          Positioned.fill(
+            child: Material(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              color: Colors.transparent,
+              child: InkWell(
+                highlightColor: Colors.transparent,
+                onTap: imagePiker,
+              ),
+            ),
+          ),
+      ],
     );
   }
 
-  ///Show bottom sheet
-  showDialogImage(int index) {
-    showModalBottomSheet(
-        context: _context,
-        builder: (BuildContext context) {
-          return Container(
-            color: const Color(0xFF737373),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.0),
-                  topRight: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20, bottom: 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    buildDialogOption(index, isForStorage: false),
-                    buildDialogOption(index),
-                    (collageCubit.state as ImageListState).images[index].imageUrl != null
-                        ? buildDialogOption(index, isForRemovePhoto: true)
-                        : Container(),
-                  ],
-                ),
-              ),
-            ),
-          );
-        });
-  }
+  // ///Show bottom sheet
+  // showDialogImage(int index, BuildContext context) {
+  //   showModalBottomSheet(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return Container(
+  //           color: const Color(0xFF737373),
+  //           child: Container(
+  //             decoration: const BoxDecoration(
+  //               color: Colors.white,
+  //               borderRadius: BorderRadius.only(
+  //                 topLeft: Radius.circular(10.0),
+  //                 topRight: Radius.circular(10.0),
+  //               ),
+  //             ),
+  //             child: Padding(
+  //               padding: const EdgeInsets.only(top: 20, bottom: 20),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: <Widget>[
+  //                   buildDialogOption(
+  //                     index,
+  //                     isForStorage: false,
+  //                     context: context,
+  //                   ),
+  //                   buildDialogOption(index, context: context),
+  //                   imageList[index].imageUrl != null
+  //                       ? buildDialogOption(
+  //                           index,
+  //                           isForRemovePhoto: true,
+  //                           context: context,
+  //                         )
+  //                       : Container(),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         );
+  //       });
+  // }
 
-  ///Show dialog
-  Widget buildDialogOption(int index, {bool isForStorage = true, bool isForRemovePhoto = false}) {
-    return TextButton(
-        onPressed: () {
-          dismissDialog();
-          isForRemovePhoto
-              ? collageCubit.dispatchRemovePhotoEvent(index: index)
-              : collageCubit.openPicker(
-                  permissionType: isForStorage ? PermissionType.storage : PermissionType.camera,
-                  index: index,
-                );
-          // imageListBloc.add(
-          //   CheckPermissionEvent(
-          //     true,
-          //     isForStorage ? PermissionType.storage : PermissionType.camera,
-          //     index,
-          //   ),
-          // );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: Icon(
-                  isForRemovePhoto
-                      ? Icons.clear
-                      : isForStorage
-                          ? Icons.photo_album
-                          : Icons.add_a_photo,
-                  color: isForRemovePhoto
-                      ? Colors.red
-                      : isForStorage
-                          ? Colors.amber
-                          : Colors.blue,
-                ),
-              ),
-              Text(isForRemovePhoto
-                  ? "Remove"
-                  : isForStorage
-                      ? "Gallery"
-                      : "Camera")
-            ],
-          ),
-        ));
-  }
+  // ///Show dialog
+  // buildDialogOption(
+  //   int index, {
+  //   bool isForStorage = true,
+  //   bool isForRemovePhoto = false,
+  //   required BuildContext context,
+  // }) {
+  //   return TextButton(
+  //       onPressed: () {
+  //         dismissDialog(context);
+  //         // isForRemovePhoto
+  //         //     ? collageCubit.dispatchRemovePhotoEvent(index: index)
+  //         //     : collageCubit.openPicker(
+  //         //         permissionType: isForStorage
+  //         //             ? PermissionType.storage
+  //         //             : PermissionType.camera,
+  //         //         index: index,
+  //         //       );
+  //       },
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(10),
+  //         child: Row(
+  //           mainAxisSize: MainAxisSize.max,
+  //           children: <Widget>[
+  //             Padding(
+  //               padding: const EdgeInsets.only(right: 16),
+  //               child: Icon(
+  //                 isForRemovePhoto
+  //                     ? Icons.clear
+  //                     : isForStorage
+  //                         ? Icons.photo_album
+  //                         : Icons.add_a_photo,
+  //                 color: isForRemovePhoto
+  //                     ? Colors.red
+  //                     : isForStorage
+  //                         ? Colors.amber
+  //                         : Colors.blue,
+  //               ),
+  //             ),
+  //             Text(isForRemovePhoto
+  //                 ? "Remove"
+  //                 : isForStorage
+  //                     ? "Gallery"
+  //                     : "Camera")
+  //           ],
+  //         ),
+  //       ));
+  // }
 
-  ///Dismiss dialog
-  dismissDialog() {
-    Navigator.of(_context, rootNavigator: true).pop(true);
-  }
+  // ///Dismiss dialog
+  // dismissDialog(BuildContext context) {
+  //   Navigator.of(context, rootNavigator: true).pop(true);
+  // }
 
   /// @param index:- index of image.
   /// @param isForCrossAxis = if from cross axis count = true
   /// Note:- If row == column then crossAxisCount = row*column // rowCount or columnCount
   /// e.g. row = 3 and column = 3 then crossAxisCount = 3*3(9) or 3
-  getCellCount({required int index, required bool isForCrossAxis, required CollageType type}) {
+  getCellCount({
+    required int index,
+    required bool isForCrossAxis,
+    required CollageType type,
+  }) {
     /// total cell count :- 2
     /// Column and Row :- 2*1 = 2 (Cross axis count)
 
@@ -339,27 +345,28 @@ class GridCollageWidget extends StatelessWidget {
   }
 
   ///Show image picker dialog
-  imagePickerDialog(int index) {
-    showDialog(
-      context: _context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          surfaceTintColor: Colors.white,
-          contentPadding: const EdgeInsets.all(5),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                buildDialogOption(index, isForStorage: false),
-                buildDialogOption(index, isForStorage: true),
-                (collageCubit.state as ImageListState).images[index].imageUrl != null
-                    ? buildDialogOption(index, isForRemovePhoto: true)
-                    : Container(),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // imagePickerDialog(int index, BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         surfaceTintColor: Colors.white,
+  //         contentPadding: const EdgeInsets.all(5),
+  //         content: SingleChildScrollView(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: <Widget>[
+  //               buildDialogOption(index, isForStorage: false, context: context),
+  //               buildDialogOption(index, isForStorage: true, context: context),
+  //               // (collageCubit.state as ImageListState).images[index].imageUrl !=
+  //               //         null
+  //               //     ? buildDialogOption(index, isForRemovePhoto: true)
+  //               //     : Container(),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }
