@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_collage_widget/utils/permission_type.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:test_package/model/image_model.dart';
 part 'collage_cubit_state.dart';
@@ -21,7 +22,7 @@ enum CollageType {
   centerBig
 }
 
-enum ImageSource { camera, gallery }
+enum PermissionType { camera, gallery, removeImage }
 
 class CollageCubit extends Cubit<CollageCubitState> {
   CollageCubit() : super(CollageCubitInitial());
@@ -42,9 +43,14 @@ class CollageCubit extends Cubit<CollageCubitState> {
         allImageSave: allImageSave,
         selectedImage: allImageSave[selectedCollageType.toString()] ?? [],
         selectedCollageType: CollageType.values.first,
+        color: Colors.white,
         random: Random().nextDouble(),
       ),
     );
+  }
+
+  void changeColor({required ImageListState state, required Color color}) {
+    emit(state.copyWith(color: color, random: Random().nextDouble()));
   }
 
   void openPicker({
@@ -54,7 +60,7 @@ class CollageCubit extends Cubit<CollageCubitState> {
     required ImageListState state,
   }) async {
     XFile? image = await ImagePicker().pickImage(
-      source: permissionType == PermissionType.storage
+      source: permissionType == PermissionType.gallery
           ? ImageSource.gallery
           : ImageSource.camera,
     );
@@ -147,6 +153,8 @@ class CollageCubit extends Cubit<CollageCubitState> {
     required bool isForCrossAxis,
     required CollageType type,
   }) {
+    print(index);
+
     /// total cell count :- 2
     /// Column and Row :- 2*1 = 2 (Cross axis count)
 

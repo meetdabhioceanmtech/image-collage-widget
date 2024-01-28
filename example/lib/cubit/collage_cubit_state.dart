@@ -23,12 +23,14 @@ class ImageListState extends CollageCubitState {
   final List<Images> selectedImage;
   final CollageType selectedCollageType;
   final Map<String, List<Images>> allImageSave;
+  final Color color;
   final double? random;
 
   const ImageListState({
     required this.selectedImage,
     required this.selectedCollageType,
     required this.allImageSave,
+    required this.color,
     this.random,
   });
 
@@ -36,12 +38,14 @@ class ImageListState extends CollageCubitState {
     List<Images>? selectedImage,
     Map<String, List<Images>>? allImageSave,
     CollageType? selectedCollageType,
+    Color? color,
     double? random,
   }) {
     return ImageListState(
       selectedImage: selectedImage ?? this.selectedImage,
       selectedCollageType: selectedCollageType ?? this.selectedCollageType,
       allImageSave: allImageSave ?? this.allImageSave,
+      color: color ?? this.color,
       random: random ?? this.random,
     );
   }
@@ -51,6 +55,7 @@ class ImageListState extends CollageCubitState {
         selectedImage,
         selectedCollageType,
         allImageSave,
+        color,
         random,
       ];
 }

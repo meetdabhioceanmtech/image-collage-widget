@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,7 +58,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
-  var color = Colors.white;
   ScreenshotController screenshotController = ScreenshotController();
   late CollageCubit collageCubit;
 
@@ -95,11 +95,52 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             [],
                         context: context,
                         isDisabled: false,
+                        isColorShow: true,
                         selectedCollageType: state.selectedCollageType,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () async {
+                      Color selectedColor = await showColorPickerDialog(
+                        context,
+                        Colors.red,
+                        backgroundColor: Colors.white,
+                        pickersEnabled: {
+                          ColorPickerType.wheel: true,
+                          ColorPickerType.both: false,
+                          ColorPickerType.accent: false,
+                          ColorPickerType.primary: false,
+                        },
+                        showRecentColors: false,
+                      );
+
+                      collageCubit.changeColor(
+                          state: state, color: selectedColor);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Frame Color Select'),
+                          Container(
+                            height: 35,
+                            width: 35,
+                            decoration: BoxDecoration(
+                              color: state.color,
+                              border: Border.all(color: Colors.black),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   bottomRowList(state)
                 ],
               ),
@@ -114,7 +155,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         onPressed: () async {
           await screenshotController.capture().then(
             (value) async {
-              var snackBar;
+              SnackBar snackBar;
               if (value != null) {
                 var isDone = await ImageGallerySaver.saveImage(
                   Uint8List.fromList(value),
@@ -176,6 +217,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     selectedCollageType: CollageType.values
                         .where((element) => element.toString() == currentKey)
                         .first,
+                    isColorShow: false,
                     state: state,
                     context: context,
                     isDisabled: true,
@@ -195,6 +237,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     bool isDisabled = false,
     required ImageListState state,
     required CollageType selectedCollageType,
+    required bool isColorShow,
   }) {
     return BlocBuilder<CollageCubit, CollageCubitState>(
       bloc: collageCubit,
@@ -227,11 +270,12 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               ),
               itemBuilder: (BuildContext context, int index) {
                 return buildRow(
+                  state: state,
                   index: index,
                   isDisabled: isDisabled,
                   context: context,
                   imageList: images,
-                  state: state,
+                  isColorShow: isColorShow,
                 );
               },
             ),
@@ -250,9 +294,10 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     required BuildContext context,
     required List<Images> imageList,
     required ImageListState state,
+    required bool isColorShow,
   }) {
     return Container(
-      color: Colors.white,
+      color: isColorShow ? state.color : Colors.transparent,
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -394,63 +439,4 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       ),
     );
   }
-
-  ///Dismiss dialog
-  // dismissDialog(BuildContext context) {
-  //   Navigator.of(context, rootNavigator: true).pop(true);
-  // }
-
-  ///Show bottom sheet
-  // showDialogImage({
-  //   required int index,
-  //   required BuildContext context,
-  //   required List<Images> imageList,
-  //   required ImageListState state,
-  // }) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Container(
-  //         color: const Color(0xFF737373),
-  //         child: Container(
-  //           decoration: const BoxDecoration(
-  //             color: Colors.white,
-  //             borderRadius: BorderRadius.only(
-  //               topLeft: Radius.circular(10.0),
-  //               topRight: Radius.circular(10.0),
-  //             ),
-  //           ),
-  //           child: Padding(
-  //             padding: const EdgeInsets.only(top: 20, bottom: 20),
-  //             child: Column(
-  //               mainAxisSize: MainAxisSize.min,
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: <Widget>[
-  //                 buildDialogOption(
-  //                   index: index,
-  //                   isForStorage: false,
-  //                   context: context,
-  //                   state: state,
-  //                 ),
-  //                 buildDialogOption(
-  //                   index: index,
-  //                   context: context,
-  //                   state: state,
-  //                 ),
-  //                 imageList[index].imageUrl != null
-  //                     ? buildDialogOption(
-  //                         index: index,
-  //                         isForRemovePhoto: true,
-  //                         context: context,
-  //                         state: state,
-  //                       )
-  //                     : Container(),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 }
