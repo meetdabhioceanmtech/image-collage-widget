@@ -11,13 +11,19 @@ enum CollageType {
   vSplit,
   hSplit,
   fourSquare,
+  sizeSquare,
   nineSquare,
   threeVerticalRight,
   threeVerticalBottom,
   threeVerticalLeft,
   threeHorizontalTop,
-  leftBig,
-  rightBig,
+  leftBigTop,
+  rightBigTop,
+  leftBigBottom,
+  rightBigBottom,
+  sevenRandom,
+  sixRandom,
+  sixRandom1,
   fourLeftBig,
   vMiddleTwo,
   centerBig
@@ -129,6 +135,8 @@ class CollageCubit extends Cubit<CollageCubitState> {
       return 2;
     } else if (collageType == CollageType.fourSquare || collageType == CollageType.fourLeftBig) {
       return 4;
+    } else if (collageType == CollageType.sizeSquare) {
+      return 6;
     } else if (collageType == CollageType.nineSquare) {
       return 9;
     } else if (collageType == CollageType.threeVerticalRight ||
@@ -136,9 +144,16 @@ class CollageCubit extends Cubit<CollageCubitState> {
         collageType == CollageType.threeVerticalBottom ||
         collageType == CollageType.threeVerticalLeft) {
       return 3;
-    } else if (collageType == CollageType.leftBig || collageType == CollageType.rightBig) {
+    } else if (collageType == CollageType.leftBigTop ||
+        collageType == CollageType.rightBigTop ||
+        collageType == CollageType.rightBigBottom ||
+        collageType == CollageType.leftBigBottom ||
+        collageType == CollageType.sixRandom ||
+        collageType == CollageType.sixRandom1) {
       return 6;
-    } else if (collageType == CollageType.vMiddleTwo || collageType == CollageType.centerBig) {
+    } else if (collageType == CollageType.vMiddleTwo ||
+        collageType == CollageType.centerBig ||
+        collageType == CollageType.sevenRandom) {
       return 7;
     }
     return 0;
@@ -151,7 +166,6 @@ class CollageCubit extends Cubit<CollageCubitState> {
   }) {
     /// total cell count :- 2
     /// Column and Row :- 2*1 = 2 (Cross axis count)
-
     if (type == CollageType.vSplit) {
       if (isForCrossAxis) {
         /// Cross axis cell count
@@ -189,6 +203,16 @@ class CollageCubit extends Cubit<CollageCubitState> {
       return 3;
     }
 
+    /// total cell count :- 6
+    /// Column and Row :- 3*2 (Cross axis count)
+    else if (type == CollageType.sizeSquare) {
+      if (isForCrossAxis) {
+        return 2;
+      } else {
+        return (index == 0 || index == 1) ? 3 : 3;
+      }
+    }
+
     /// total cell count :- 3
     /// Column and Row :- 2 * 2
     /// First index taking 2 cell count in main axis and also in cross axis.
@@ -223,17 +247,29 @@ class CollageCubit extends Cubit<CollageCubitState> {
     /// First index taking 2 cell in main axis and also in cross axis.
     /// Cross axis count = 3
 
-    else if (type == CollageType.leftBig) {
+    else if (type == CollageType.leftBigTop) {
       if (isForCrossAxis) {
         return (index == 0) ? 2 : 1;
       } else {
         return (index == 0) ? 2 : 1;
       }
-    } else if (type == CollageType.rightBig) {
+    } else if (type == CollageType.rightBigTop) {
       if (isForCrossAxis) {
         return (index == 1) ? 2 : 1;
       } else {
         return (index == 1) ? 2 : 1;
+      }
+    } else if (type == CollageType.rightBigBottom) {
+      if (isForCrossAxis) {
+        return (index == 4) ? 2 : 1;
+      } else {
+        return (index == 4) ? 2 : 1;
+      }
+    } else if (type == CollageType.leftBigBottom) {
+      if (isForCrossAxis) {
+        return (index == 3) ? 2 : 1;
+      } else {
+        return (index == 3) ? 2 : 1;
       }
     } else if (type == CollageType.fourLeftBig) {
       if (isForCrossAxis) {
@@ -250,6 +286,25 @@ class CollageCubit extends Cubit<CollageCubitState> {
       /// First column each cross axis tile count = cross axis count/ total tile count(In cross axis)  {12/3 = 4]
       /// Second column cross axis cell count :- 12/4 = 3
       /// Main axis count : Cross axis count / column count {12/2 = 6}
+      ///
+    } else if (type == CollageType.sixRandom1) {
+      if (isForCrossAxis) {
+        return (index == 2 || index == 1) ? 2 : 1;
+      } else {
+        return (index == 0) ? 2 : 1;
+      }
+    } else if (type == CollageType.sixRandom) {
+      if (isForCrossAxis) {
+        return (index == 1 || index == 3) ? 2 : 1;
+      } else {
+        return (index == 0) ? 2 : 1;
+      }
+    } else if (type == CollageType.sevenRandom) {
+      if (isForCrossAxis) {
+        return (index == 1) ? 2 : 1;
+      } else {
+        return (index == 2) ? 2 : 1;
+      }
     } else if (type == CollageType.vMiddleTwo) {
       if (isForCrossAxis) {
         return 6;
@@ -290,9 +345,17 @@ class CollageCubit extends Cubit<CollageCubitState> {
       return 2;
     } else if (type == CollageType.fourSquare) {
       return 4;
+    } else if (type == CollageType.sizeSquare) {
+      return 6;
     } else if (type == CollageType.nineSquare) {
       return 9;
-    } else if (type == CollageType.leftBig || type == CollageType.rightBig) {
+    } else if (type == CollageType.leftBigTop ||
+        type == CollageType.rightBigTop ||
+        type == CollageType.leftBigBottom ||
+        type == CollageType.rightBigBottom ||
+        type == CollageType.sevenRandom ||
+        type == CollageType.sixRandom ||
+        type == CollageType.sixRandom1) {
       return 3;
     } else if (type == CollageType.fourLeftBig) {
       return 3;
