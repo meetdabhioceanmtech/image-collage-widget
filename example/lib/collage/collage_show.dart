@@ -27,9 +27,7 @@ class CollageWidget {
               primary: false,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: images.length,
-              crossAxisCount: collageCubit.getCrossAxisCount(
-                type: selectedCollageType,
-              ),
+              crossAxisCount: collageCubit.getCrossAxisCount(type: selectedCollageType),
               staggeredTileBuilder: (int index) => StaggeredTile.count(
                 collageCubit.getCellCount(
                   index: index,

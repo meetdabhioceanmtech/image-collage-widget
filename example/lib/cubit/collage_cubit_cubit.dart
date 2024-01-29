@@ -12,10 +12,12 @@ enum CollageType {
   hSplit,
   fourSquare,
   nineSquare,
-  threeVertical,
+  threeVerticalRight,
+  threeVerticalBottom,
+  threeVerticalLeft,
+  threeHorizontalTop,
   leftBig,
   rightBig,
-  threeHorizontal,
   fourLeftBig,
   vMiddleTwo,
   centerBig
@@ -129,7 +131,10 @@ class CollageCubit extends Cubit<CollageCubitState> {
       return 4;
     } else if (collageType == CollageType.nineSquare) {
       return 9;
-    } else if (collageType == CollageType.threeVertical || collageType == CollageType.threeHorizontal) {
+    } else if (collageType == CollageType.threeVerticalRight ||
+        collageType == CollageType.threeHorizontalTop ||
+        collageType == CollageType.threeVerticalBottom ||
+        collageType == CollageType.threeVerticalLeft) {
       return 3;
     } else if (collageType == CollageType.leftBig || collageType == CollageType.rightBig) {
       return 6;
@@ -187,13 +192,25 @@ class CollageCubit extends Cubit<CollageCubitState> {
     /// total cell count :- 3
     /// Column and Row :- 2 * 2
     /// First index taking 2 cell count in main axis and also in cross axis.
-    else if (type == CollageType.threeVertical) {
+    else if (type == CollageType.threeVerticalRight) {
       if (isForCrossAxis) {
         return 1;
       } else {
         return (index == 0) ? 2 : 1;
       }
-    } else if (type == CollageType.threeHorizontal) {
+    } else if (type == CollageType.threeVerticalBottom) {
+      if (isForCrossAxis) {
+        return (index == 2) ? 2 : 1;
+      } else {
+        return 1;
+      }
+    } else if (type == CollageType.threeVerticalLeft) {
+      if (isForCrossAxis) {
+        return 1;
+      } else {
+        return (index == 1) ? 2 : 1;
+      }
+    } else if (type == CollageType.threeHorizontalTop) {
       if (isForCrossAxis) {
         return (index == 0) ? 2 : 1;
       } else {
@@ -266,8 +283,10 @@ class CollageCubit extends Cubit<CollageCubitState> {
     // Use crossAxisCount based on collage type
     if (type == CollageType.hSplit ||
         type == CollageType.vSplit ||
-        type == CollageType.threeHorizontal ||
-        type == CollageType.threeVertical) {
+        type == CollageType.threeHorizontalTop ||
+        type == CollageType.threeVerticalRight ||
+        type == CollageType.threeVerticalBottom ||
+        type == CollageType.threeVerticalLeft) {
       return 2;
     } else if (type == CollageType.fourSquare) {
       return 4;
