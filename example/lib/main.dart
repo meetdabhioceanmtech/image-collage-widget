@@ -1,15 +1,13 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:test_package/collage/collage_show.dart';
 import 'package:test_package/cubit/collage_cubit_cubit.dart';
-import 'package:test_package/model/image_model.dart';
 
 void main() {
   BlocOverrides.runZoned(
@@ -87,12 +85,10 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     padding: const EdgeInsets.all(8.0),
                     child: Screenshot(
                       controller: screenshotController,
-                      child: gridShow(
+                      child: CollageWidget().commonCollageShow(
                         state: state,
-                        images: state.allImageSave[
-                                    state.selectedCollageType.toString()]
-                                ?.toList() ??
-                            [],
+                        collageCubit: collageCubit,
+                        images: state.allImageSave[state.selectedCollageType.toString()]?.toList() ?? [],
                         context: context,
                         isDisabled: false,
                         isColorShow: true,
@@ -116,8 +112,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         showRecentColors: false,
                       );
 
-                      collageCubit.changeColor(
-                          state: state, color: selectedColor);
+                      collageCubit.changeColor(state: state, color: selectedColor);
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(15.0),
@@ -193,8 +188,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           String currentKey = state.allImageSave.keys.elementAt(index);
           return Container(
             margin: const EdgeInsets.all(5),
-            padding: EdgeInsets.all(
-                state.selectedCollageType.toString() == currentKey ? 1 : 5),
+            padding: EdgeInsets.all(state.selectedCollageType.toString() == currentKey ? 1 : 5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: state.selectedCollageType.toString() == currentKey
@@ -204,19 +198,16 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             child: GestureDetector(
               onTap: () {
                 collageCubit.blankList(
-                  selectedCollageType: CollageType.values
-                      .where((element) => element.toString() == currentKey)
-                      .first,
+                  selectedCollageType: CollageType.values.where((element) => element.toString() == currentKey).first,
                   state: state,
                 );
               },
               child: Center(
                 child: SizedBox(
-                  child: gridShow(
+                  child: CollageWidget().commonCollageShow(
+                    collageCubit: collageCubit,
                     images: state.allImageSave.values.elementAt(index),
-                    selectedCollageType: CollageType.values
-                        .where((element) => element.toString() == currentKey)
-                        .first,
+                    selectedCollageType: CollageType.values.where((element) => element.toString() == currentKey).first,
                     isColorShow: false,
                     state: state,
                     context: context,
@@ -227,215 +218,6 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget gridShow({
-    required List<Images> images,
-    required BuildContext context,
-    bool isDisabled = false,
-    required ImageListState state,
-    required CollageType selectedCollageType,
-    required bool isColorShow,
-  }) {
-    return BlocBuilder<CollageCubit, CollageCubitState>(
-      bloc: collageCubit,
-      builder: (context, state) {
-        if (state is ImageListState) {
-          return AspectRatio(
-            aspectRatio: 1.0 / 1.0,
-            child: StaggeredGridView.countBuilder(
-              key: UniqueKey(),
-              shrinkWrap: true,
-              primary: false,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: images.length,
-              crossAxisCount: collageCubit.getCrossAxisCount(
-                type: selectedCollageType,
-              ),
-              staggeredTileBuilder: (int index) => StaggeredTile.count(
-                collageCubit.getCellCount(
-                  index: index,
-                  isForCrossAxis: true,
-                  type: selectedCollageType,
-                ),
-                double.tryParse(collageCubit
-                    .getCellCount(
-                      index: index,
-                      isForCrossAxis: false,
-                      type: selectedCollageType,
-                    )
-                    .toString()),
-              ),
-              itemBuilder: (BuildContext context, int index) {
-                return buildRow(
-                  state: state,
-                  index: index,
-                  isDisabled: isDisabled,
-                  context: context,
-                  imageList: images,
-                  isColorShow: isColorShow,
-                );
-              },
-            ),
-          );
-        } else {
-          return const SizedBox();
-        }
-      },
-    );
-  }
-
-  ///Build UI either image is selected or not
-  buildRow({
-    required int index,
-    required bool isDisabled,
-    required BuildContext context,
-    required List<Images> imageList,
-    required ImageListState state,
-    required bool isColorShow,
-  }) {
-    return Container(
-      color: isColorShow ? state.color : Colors.transparent,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Positioned.fill(
-            bottom: 0.0,
-            child: Padding(
-              padding: const EdgeInsets.all(3),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(5)),
-                child: imageList[index].imageUrl != null && !isDisabled
-                    ? Image.file(
-                        imageList[index].imageUrl ?? File(''),
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        color: const Color(0xFFD3D3D3),
-                        child: isDisabled ? null : const Icon(Icons.add),
-                      ),
-              ),
-            ),
-          ),
-          if (!isDisabled)
-            Positioned.fill(
-              child: Material(
-                borderRadius: const BorderRadius.all(Radius.circular(5)),
-                color: Colors.transparent,
-                child: InkWell(
-                  highlightColor: Colors.transparent,
-                  onTap: () => showImagePickerDialog(
-                    index: index,
-                    context: context,
-                    imageList: imageList,
-                    state: state,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  showImagePickerDialog({
-    required int index,
-    required BuildContext context,
-    required List<Images> imageList,
-    required ImageListState state,
-  }) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          surfaceTintColor: Colors.white,
-          contentPadding: const EdgeInsets.all(5),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                buildDialogOption(
-                    index: index,
-                    isForStorage: false,
-                    context: context,
-                    state: state,
-                    permissionType: PermissionType.camera),
-                buildDialogOption(
-                    index: index,
-                    isForStorage: true,
-                    context: context,
-                    state: state,
-                    permissionType: PermissionType.gallery),
-                imageList[index].imageUrl != null
-                    ? buildDialogOption(
-                        context: context,
-                        index: index,
-                        state: state,
-                        permissionType: PermissionType.removeImage)
-                    : Container(),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  ///Show dialog
-  buildDialogOption({
-    required int index,
-    bool isForStorage = true,
-    required BuildContext context,
-    required ImageListState state,
-    required PermissionType permissionType,
-  }) {
-    return TextButton(
-      onPressed: () {
-        Navigator.of(context, rootNavigator: true).pop(true);
-        permissionType == PermissionType.removeImage
-            ? collageCubit.dispatchRemovePhotoEvent(
-                state: state,
-                index: index,
-                selectedCollageType: state.selectedCollageType,
-              )
-            : collageCubit.openPicker(
-                state: state,
-                selectedCollageType: state.selectedCollageType,
-                permissionType: permissionType,
-                index: index,
-              );
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Icon(
-                permissionType == PermissionType.removeImage
-                    ? Icons.clear
-                    : isForStorage
-                        ? Icons.photo_album
-                        : Icons.add_a_photo,
-                color: permissionType == PermissionType.removeImage
-                    ? Colors.red
-                    : isForStorage
-                        ? Colors.amber
-                        : Colors.blue,
-              ),
-            ),
-            Text(
-              permissionType == PermissionType.removeImage
-                  ? "Remove"
-                  : isForStorage
-                      ? "Gallery"
-                      : "Camera",
-            )
-          ],
-        ),
       ),
     );
   }

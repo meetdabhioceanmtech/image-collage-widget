@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,9 +59,7 @@ class CollageCubit extends Cubit<CollageCubitState> {
     required ImageListState state,
   }) async {
     XFile? image = await ImagePicker().pickImage(
-      source: permissionType == PermissionType.gallery
-          ? ImageSource.gallery
-          : ImageSource.camera,
+      source: permissionType == PermissionType.gallery ? ImageSource.gallery : ImageSource.camera,
     );
 
     if (image != null) {
@@ -113,8 +110,7 @@ class CollageCubit extends Cubit<CollageCubitState> {
     required CollageType selectedCollageType,
     required ImageListState state,
   }) {
-    List<Images>? selectedImage =
-        state.allImageSave[selectedCollageType.toString()];
+    List<Images>? selectedImage = state.allImageSave[selectedCollageType.toString()];
     emit(
       state.copyWith(
         allImageSave: state.allImageSave,
@@ -127,22 +123,17 @@ class CollageCubit extends Cubit<CollageCubitState> {
 
   /// The no. of image return as per collage type.
   int getImageCount({required CollageType collageType}) {
-    if (collageType == CollageType.hSplit ||
-        collageType == CollageType.vSplit) {
+    if (collageType == CollageType.hSplit || collageType == CollageType.vSplit) {
       return 2;
-    } else if (collageType == CollageType.fourSquare ||
-        collageType == CollageType.fourLeftBig) {
+    } else if (collageType == CollageType.fourSquare || collageType == CollageType.fourLeftBig) {
       return 4;
     } else if (collageType == CollageType.nineSquare) {
       return 9;
-    } else if (collageType == CollageType.threeVertical ||
-        collageType == CollageType.threeHorizontal) {
+    } else if (collageType == CollageType.threeVertical || collageType == CollageType.threeHorizontal) {
       return 3;
-    } else if (collageType == CollageType.leftBig ||
-        collageType == CollageType.rightBig) {
+    } else if (collageType == CollageType.leftBig || collageType == CollageType.rightBig) {
       return 6;
-    } else if (collageType == CollageType.vMiddleTwo ||
-        collageType == CollageType.centerBig) {
+    } else if (collageType == CollageType.vMiddleTwo || collageType == CollageType.centerBig) {
       return 7;
     }
     return 0;
@@ -153,8 +144,6 @@ class CollageCubit extends Cubit<CollageCubitState> {
     required bool isForCrossAxis,
     required CollageType type,
   }) {
-    print(index);
-
     /// total cell count :- 2
     /// Column and Row :- 2*1 = 2 (Cross axis count)
 
@@ -288,8 +277,7 @@ class CollageCubit extends Cubit<CollageCubitState> {
       return 3;
     } else if (type == CollageType.fourLeftBig) {
       return 3;
-    } else if (type == CollageType.vMiddleTwo ||
-        type == CollageType.centerBig) {
+    } else if (type == CollageType.vMiddleTwo || type == CollageType.centerBig) {
       return 12;
     }
     return 0;
