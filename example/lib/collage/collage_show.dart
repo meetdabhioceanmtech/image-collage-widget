@@ -21,38 +21,38 @@ class CollageWidget {
         if (state is ImageListState) {
           return AspectRatio(
             aspectRatio: 1.0 / 1.0,
-            child: StaggeredGridView.countBuilder(
+            child: StaggeredGrid.count(
               key: UniqueKey(),
-              shrinkWrap: true,
-              primary: false,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: images.length,
               crossAxisCount: collageCubit.getCrossAxisCount(type: selectedCollageType),
-              staggeredTileBuilder: (int index) => StaggeredTile.count(
-                collageCubit.getCellCount(
-                  index: index,
-                  isForCrossAxis: true,
-                  type: selectedCollageType,
-                ),
-                double.tryParse(collageCubit
-                    .getCellCount(
+              children: List.generate(
+                images.length,
+                (index) {
+                  return StaggeredGridTile.count(
+                    crossAxisCellCount: collageCubit.getCellCount(
                       index: index,
-                      isForCrossAxis: false,
+                      isForCrossAxis: true,
                       type: selectedCollageType,
-                    )
-                    .toString()),
+                    ),
+                    mainAxisCellCount: double.tryParse(collageCubit
+                            .getCellCount(
+                              index: index,
+                              isForCrossAxis: false,
+                              type: selectedCollageType,
+                            )
+                            .toString()) ??
+                        0,
+                    child: buildRow(
+                      state: state,
+                      index: index,
+                      isDisabled: isDisabled,
+                      context: context,
+                      imageList: images,
+                      isColorShow: isColorShow,
+                      collageCubit: collageCubit,
+                    ),
+                  );
+                },
               ),
-              itemBuilder: (BuildContext context, int index) {
-                return buildRow(
-                  state: state,
-                  index: index,
-                  isDisabled: isDisabled,
-                  context: context,
-                  imageList: images,
-                  isColorShow: isColorShow,
-                  collageCubit: collageCubit,
-                );
-              },
             ),
           );
         } else {
