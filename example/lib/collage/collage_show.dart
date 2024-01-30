@@ -3,50 +3,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:test_package/cubit/collage_cubit_cubit.dart';
-import 'package:test_package/model/image_model.dart';
 
 class CollageWidget {
   Widget commonCollageShow({
-    required List<Images> images,
     required BuildContext context,
     bool isDisabled = false,
-    required ImageListState state,
-    required CollageType selectedCollageType,
     required bool isColorShow,
     required CollageCubit collageCubit,
+    required Collage collageData,
   }) {
     return BlocBuilder<CollageCubit, CollageCubitState>(
       bloc: collageCubit,
       builder: (context, state) {
         if (state is ImageListState) {
+          // print(images);
           return AspectRatio(
             aspectRatio: 1.0 / 1.0,
             child: StaggeredGrid.count(
-              key: UniqueKey(),
-              crossAxisCount: collageCubit.getCrossAxisCount(type: selectedCollageType),
+              // key: UniqueKey(),
+              crossAxisCount: collageData.maincrossAxisCellCount,
               children: List.generate(
-                images.length,
+                collageData.tiles.length,
                 (index) {
+                  CollageTileData tiles = collageData.tiles[index];
+                  print(isColorShow ? '=== crossAxisCellCount ${tiles.crossAxisCellCount}' : "");
+                  print(isColorShow ? '=== mainAxisCellCount ${tiles.mainAxisCellCount}' : "");
                   return StaggeredGridTile.count(
-                    crossAxisCellCount: collageCubit.getCellCount(
-                      index: index,
-                      isForCrossAxis: true,
-                      type: selectedCollageType,
-                    ),
-                    mainAxisCellCount: double.tryParse(collageCubit
-                            .getCellCount(
-                              index: index,
-                              isForCrossAxis: false,
-                              type: selectedCollageType,
-                            )
-                            .toString()) ??
-                        0,
+                    crossAxisCellCount: tiles.crossAxisCellCount,
+                    mainAxisCellCount: tiles.mainAxisCellCount,
                     child: buildRow(
                       state: state,
                       index: index,
                       isDisabled: isDisabled,
                       context: context,
-                      imageList: images,
+                      tiles: tiles,
+                      // imageList: images,
                       isColorShow: isColorShow,
                       collageCubit: collageCubit,
                     ),
@@ -67,10 +58,11 @@ class CollageWidget {
     required int index,
     required bool isDisabled,
     required BuildContext context,
-    required List<Images> imageList,
+    // required List<Images> imageList,
     required ImageListState state,
     required bool isColorShow,
     required CollageCubit collageCubit,
+    required CollageTileData tiles,
   }) {
     return Container(
       color: isColorShow ? state.color : Colors.transparent,
@@ -83,14 +75,18 @@ class CollageWidget {
               padding: const EdgeInsets.all(3),
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(5)),
-                child: imageList[index].imageUrl != null && !isDisabled
+                child: tiles.imagePath != '' && !isDisabled
                     ? Image.file(
-                        imageList[index].imageUrl ?? File(''),
+                        File(tiles.imagePath),
                         fit: BoxFit.cover,
                       )
                     : Container(
                         color: const Color(0xFFD3D3D3),
-                        child: isDisabled ? null : const Icon(Icons.add),
+                        child: 1 == 1
+                            ? Text(tiles.imageId.toString())
+                            : isDisabled
+                                ? null
+                                : const Icon(Icons.add),
                       ),
               ),
             ),
@@ -105,7 +101,7 @@ class CollageWidget {
                   onTap: () => showImagePickerDialog(
                     index: index,
                     context: context,
-                    imageList: imageList,
+                    tiles: tiles,
                     state: state,
                     collageCubit: collageCubit,
                   ),
@@ -120,9 +116,10 @@ class CollageWidget {
   showImagePickerDialog({
     required int index,
     required BuildContext context,
-    required List<Images> imageList,
+    // required List<Images> imageList,
     required ImageListState state,
     required CollageCubit collageCubit,
+    required CollageTileData tiles,
   }) {
     showDialog(
       context: context,
@@ -150,13 +147,14 @@ class CollageWidget {
                   collageCubit: collageCubit,
                   permissionType: PermissionType.gallery,
                 ),
-                imageList[index].imageUrl != null
+                tiles.imagePath != ''
                     ? buildDialogOption(
                         context: context,
                         index: index,
                         state: state,
                         permissionType: PermissionType.removeImage,
-                        collageCubit: collageCubit)
+                        collageCubit: collageCubit,
+                      )
                     : Container(),
               ],
             ),
@@ -181,12 +179,10 @@ class CollageWidget {
         permissionType == PermissionType.removeImage
             ? collageCubit.dispatchRemovePhotoEvent(
                 state: state,
-                index: index,
-                selectedCollageType: state.selectedCollageType,
+                index: index, 
               )
             : collageCubit.openPicker(
-                state: state,
-                selectedCollageType: state.selectedCollageType,
+                state: state, 
                 permissionType: permissionType,
                 index: index,
               );

@@ -20,42 +20,28 @@ class PermissionDeniedState extends CollageCubitState {
 }
 
 class ImageListState extends CollageCubitState {
-  final List<Images> selectedImage;
-  final CollageType selectedCollageType;
-  final Map<String, List<Images>> allImageSave;
+  final int selectedCollageId;
   final Color color;
   final double? random;
 
   const ImageListState({
-    required this.selectedImage,
-    required this.selectedCollageType,
-    required this.allImageSave,
+    required this.selectedCollageId,
     required this.color,
     this.random,
   });
 
   ImageListState copyWith({
-    List<Images>? selectedImage,
-    Map<String, List<Images>>? allImageSave,
-    CollageType? selectedCollageType,
+    int? selectedCollageId,
     Color? color,
     double? random,
   }) {
     return ImageListState(
-      selectedImage: selectedImage ?? this.selectedImage,
-      selectedCollageType: selectedCollageType ?? this.selectedCollageType,
-      allImageSave: allImageSave ?? this.allImageSave,
+      selectedCollageId: selectedCollageId ?? this.selectedCollageId,
       color: color ?? this.color,
       random: random ?? this.random,
     );
   }
 
   @override
-  List<Object?> get props => [
-        selectedImage,
-        selectedCollageType,
-        allImageSave,
-        color,
-        random,
-      ];
+  List<Object?> get props => [selectedCollageId, color, random];
 }

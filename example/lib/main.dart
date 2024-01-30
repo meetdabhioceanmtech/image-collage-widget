@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+// ignore_for_file: deprecated_member_use
 
 import 'dart:typed_data';
 import 'package:flex_color_picker/flex_color_picker.dart';
@@ -15,6 +15,8 @@ void main() {
     blocObserver: AppBlocObserver(),
   );
 }
+
+List<Collage> dummyData = [];
 
 class AppBlocObserver extends BlocObserver {
   @override
@@ -64,12 +66,97 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     collageCubit = BlocProvider.of<CollageCubit>(context);
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      collageCubit.inistall(selectedCollageType: CollageType.values.first);
+      collageCubit.inistall(selectedCollageId: 1);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    dummyData = [
+      Collage(
+        id: 1,
+        maincrossAxisCellCount: 2,
+        totalImage: 2,
+        tiles: [
+          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
+          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
+        ],
+      ),
+      Collage(
+        id: 2,
+        maincrossAxisCellCount: 2,
+        totalImage: 2,
+        tiles: [
+          CollageTileData(imageId: 1, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 2, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
+        ],
+      ),
+      Collage(
+        id: 3,
+        maincrossAxisCellCount: 2,
+        totalImage: 3,
+        tiles: [
+          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
+          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 3, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+        ],
+      ),
+      Collage(
+        id: 4,
+        maincrossAxisCellCount: 2,
+        totalImage: 3,
+        tiles: [
+          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
+          CollageTileData(imageId: 3, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+        ],
+      ),
+      Collage(
+        id: 5,
+        maincrossAxisCellCount: 2,
+        totalImage: 3,
+        tiles: [
+          CollageTileData(imageId: 1, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 3, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+        ],
+      ),
+      Collage(
+        id: 6,
+        maincrossAxisCellCount: 2,
+        totalImage: 3,
+        tiles: [
+          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 3, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
+        ],
+      ),
+      Collage(
+        id: 7,
+        maincrossAxisCellCount: 2,
+        totalImage: 4,
+        tiles: [
+          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 3, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 4, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+        ],
+      ),
+      Collage(
+        id: 8,
+        maincrossAxisCellCount: 4,
+        totalImage: 6,
+        tiles: [
+          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 3, imagePath: ''),
+          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 3, imagePath: ''),
+          CollageTileData(imageId: 3, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 4, crossAxisCellCount: 2, mainAxisCellCount: 2, imagePath: ''),
+          CollageTileData(imageId: 5, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+          CollageTileData(imageId: 6, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+        ],
+      ),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Image Collage"),
@@ -86,55 +173,16 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     child: Screenshot(
                       controller: screenshotController,
                       child: CollageWidget().commonCollageShow(
-                        state: state,
                         collageCubit: collageCubit,
-                        images: state.allImageSave[state.selectedCollageType.toString()]?.toList() ?? [],
+                        collageData: dummyData.where((element) => element.id == state.selectedCollageId).first,
                         context: context,
                         isDisabled: false,
                         isColorShow: true,
-                        selectedCollageType: state.selectedCollageType,
                       ),
                     ),
                   ),
                   const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () async {
-                      Color selectedColor = await showColorPickerDialog(
-                        context,
-                        Colors.red,
-                        backgroundColor: Colors.white,
-                        pickersEnabled: {
-                          ColorPickerType.wheel: true,
-                          ColorPickerType.both: false,
-                          ColorPickerType.accent: false,
-                          ColorPickerType.primary: false,
-                        },
-                        showRecentColors: false,
-                      );
-
-                      collageCubit.changeColor(state: state, color: selectedColor);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Frame Color Select'),
-                          Container(
-                            height: 35,
-                            width: 35,
-                            decoration: BoxDecoration(
-                              color: state.color,
-                              border: Border.all(color: Colors.black),
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  colorSelection(context, state),
                   const SizedBox(height: 10),
                   bottomRowList(state)
                 ],
@@ -175,44 +223,77 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
   }
 
+  Widget colorSelection(BuildContext context, ImageListState state) {
+    return GestureDetector(
+      onTap: () async {
+        Color selectedColor = await showColorPickerDialog(
+          context,
+          Colors.red,
+          backgroundColor: Colors.white,
+          pickersEnabled: {
+            ColorPickerType.wheel: true,
+            ColorPickerType.both: false,
+            ColorPickerType.accent: false,
+            ColorPickerType.primary: false,
+          },
+          showRecentColors: false,
+        );
+        collageCubit.changeColor(state: state, color: selectedColor);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Frame Color Select'),
+            Container(
+              height: 35,
+              width: 35,
+              decoration: BoxDecoration(
+                color: state.color,
+                border: Border.all(color: Colors.black),
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(10),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget bottomRowList(ImageListState state) {
     return SizedBox(
       height: 100,
       child: ListView.builder(
-        itemCount: state.allImageSave.length,
+        itemCount: dummyData.length,
         shrinkWrap: false,
         primary: true,
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         itemBuilder: (context, index) {
-          String currentKey = state.allImageSave.keys.elementAt(index);
+          Collage collage = dummyData[index];
           return Container(
             margin: const EdgeInsets.all(5),
-            padding: EdgeInsets.all(state.selectedCollageType.toString() == currentKey ? 1 : 5),
+            padding: EdgeInsets.all(state.selectedCollageId == collage.id ? 1 : 5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: state.selectedCollageType.toString() == currentKey
+              color: state.selectedCollageId == collage.id
                   ? Colors.black.withOpacity(0.8)
-                  : Colors.grey.withOpacity(0.1),
+                  : Colors.grey.withOpacity(
+                      0.1,
+                    ),
             ),
             child: GestureDetector(
-              onTap: () {
-                collageCubit.blankList(
-                  selectedCollageType: CollageType.values.where((element) => element.toString() == currentKey).first,
-                  state: state,
-                );
-              },
+              onTap: () => collageCubit.blankList(state: state, selectedId: collage.id),
               child: Center(
-                child: SizedBox(
-                  child: CollageWidget().commonCollageShow(
-                    collageCubit: collageCubit,
-                    images: state.allImageSave.values.elementAt(index),
-                    selectedCollageType: CollageType.values.where((element) => element.toString() == currentKey).first,
-                    isColorShow: false,
-                    state: state,
-                    context: context,
-                    isDisabled: true,
-                  ),
+                child: CollageWidget().commonCollageShow(
+                  context: context,
+                  isColorShow: false,
+                  isDisabled: true,
+                  collageCubit: collageCubit,
+                  collageData: dummyData[index],
                 ),
               ),
             ),
