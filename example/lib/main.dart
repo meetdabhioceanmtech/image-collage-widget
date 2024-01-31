@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'dart:typed_data';
 import 'package:flex_color_picker/flex_color_picker.dart';
@@ -8,6 +8,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:test_package/collage/collage_show.dart';
 import 'package:test_package/cubit/collage_cubit_cubit.dart';
+import 'package:test_package/model/image_model.dart';
 
 void main() {
   BlocOverrides.runZoned(
@@ -15,8 +16,6 @@ void main() {
     blocObserver: AppBlocObserver(),
   );
 }
-
-List<Collage> dummyData = [];
 
 class AppBlocObserver extends BlocObserver {
   @override
@@ -39,7 +38,7 @@ class MyApp extends StatelessWidget {
       create: (context) => CollageCubit(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'Task: 4',
         theme: ThemeData(
           primaryColor: Colors.blue,
           primarySwatch: Colors.blue,
@@ -72,91 +71,6 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    dummyData = [
-      Collage(
-        id: 1,
-        maincrossAxisCellCount: 2,
-        totalImage: 2,
-        tiles: [
-          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
-          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
-        ],
-      ),
-      Collage(
-        id: 2,
-        maincrossAxisCellCount: 2,
-        totalImage: 2,
-        tiles: [
-          CollageTileData(imageId: 1, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 2, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
-        ],
-      ),
-      Collage(
-        id: 3,
-        maincrossAxisCellCount: 2,
-        totalImage: 3,
-        tiles: [
-          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
-          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 3, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-        ],
-      ),
-      Collage(
-        id: 4,
-        maincrossAxisCellCount: 2,
-        totalImage: 3,
-        tiles: [
-          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
-          CollageTileData(imageId: 3, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-        ],
-      ),
-      Collage(
-        id: 5,
-        maincrossAxisCellCount: 2,
-        totalImage: 3,
-        tiles: [
-          CollageTileData(imageId: 1, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 3, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-        ],
-      ),
-      Collage(
-        id: 6,
-        maincrossAxisCellCount: 2,
-        totalImage: 3,
-        tiles: [
-          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 3, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
-        ],
-      ),
-      Collage(
-        id: 7,
-        maincrossAxisCellCount: 2,
-        totalImage: 4,
-        tiles: [
-          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 3, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 4, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-        ],
-      ),
-      Collage(
-        id: 8,
-        maincrossAxisCellCount: 4,
-        totalImage: 6,
-        tiles: [
-          CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 3, imagePath: ''),
-          CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 3, imagePath: ''),
-          CollageTileData(imageId: 3, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 4, crossAxisCellCount: 2, mainAxisCellCount: 2, imagePath: ''),
-          CollageTileData(imageId: 5, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-          CollageTileData(imageId: 6, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-        ],
-      ),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Image Collage"),
@@ -173,11 +87,11 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     child: Screenshot(
                       controller: screenshotController,
                       child: CollageWidget().commonCollageShow(
-                        collageCubit: collageCubit,
-                        collageData: dummyData.where((element) => element.id == state.selectedCollageId).first,
                         context: context,
                         isDisabled: false,
                         isColorShow: true,
+                        collageCubit: collageCubit,
+                        collageData: dummyData.where((element) => element.id == state.selectedCollageId).first,
                       ),
                     ),
                   ),
@@ -268,7 +182,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       height: 100,
       child: ListView.builder(
         itemCount: dummyData.length,
-        shrinkWrap: false,
+        shrinkWrap: true,
         primary: true,
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 10),

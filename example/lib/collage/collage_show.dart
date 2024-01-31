@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:test_package/cubit/collage_cubit_cubit.dart';
+import 'package:test_package/model/image_model.dart';
 
 class CollageWidget {
   Widget commonCollageShow({
@@ -16,18 +17,16 @@ class CollageWidget {
       bloc: collageCubit,
       builder: (context, state) {
         if (state is ImageListState) {
-          // print(images);
           return AspectRatio(
             aspectRatio: 1.0 / 1.0,
             child: StaggeredGrid.count(
               // key: UniqueKey(),
               crossAxisCount: collageData.maincrossAxisCellCount,
+              axisDirection: AxisDirection.right,
               children: List.generate(
                 collageData.tiles.length,
                 (index) {
                   CollageTileData tiles = collageData.tiles[index];
-                  print(isColorShow ? '=== crossAxisCellCount ${tiles.crossAxisCellCount}' : "");
-                  print(isColorShow ? '=== mainAxisCellCount ${tiles.mainAxisCellCount}' : "");
                   return StaggeredGridTile.count(
                     crossAxisCellCount: tiles.crossAxisCellCount,
                     mainAxisCellCount: tiles.mainAxisCellCount,
@@ -37,7 +36,6 @@ class CollageWidget {
                       isDisabled: isDisabled,
                       context: context,
                       tiles: tiles,
-                      // imageList: images,
                       isColorShow: isColorShow,
                       collageCubit: collageCubit,
                     ),
@@ -58,7 +56,6 @@ class CollageWidget {
     required int index,
     required bool isDisabled,
     required BuildContext context,
-    // required List<Images> imageList,
     required ImageListState state,
     required bool isColorShow,
     required CollageCubit collageCubit,
@@ -68,27 +65,20 @@ class CollageWidget {
       color: isColorShow ? state.color : Colors.transparent,
       child: Stack(
         fit: StackFit.expand,
-        children: <Widget>[
-          Positioned.fill(
-            bottom: 0.0,
-            child: Padding(
-              padding: const EdgeInsets.all(3),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(5)),
-                child: tiles.imagePath != '' && !isDisabled
-                    ? Image.file(
-                        File(tiles.imagePath),
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        color: const Color(0xFFD3D3D3),
-                        child: 1 == 1
-                            ? Text(tiles.imageId.toString())
-                            : isDisabled
-                                ? null
-                                : const Icon(Icons.add),
-                      ),
-              ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(3),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              child: tiles.imagePath != '' && !isDisabled
+                  ? Image.file(
+                      File(tiles.imagePath),
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      color: const Color(0xFFD3D3D3),
+                      child: isDisabled ? null : const Icon(Icons.add),
+                    ),
             ),
           ),
           if (!isDisabled)
@@ -179,10 +169,10 @@ class CollageWidget {
         permissionType == PermissionType.removeImage
             ? collageCubit.dispatchRemovePhotoEvent(
                 state: state,
-                index: index, 
+                index: index,
               )
             : collageCubit.openPicker(
-                state: state, 
+                state: state,
                 permissionType: permissionType,
                 index: index,
               );
