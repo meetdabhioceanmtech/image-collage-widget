@@ -25,7 +25,7 @@ class CollageTileData {
   });
 }
 
-List<Collage> dummyData = dummyData = [
+List<Collage> dummyData = [
   Collage(
     id: 1,
     maincrossAxisCellCount: 2,
@@ -97,15 +97,54 @@ List<Collage> dummyData = dummyData = [
   ),
   Collage(
     id: 8,
-    maincrossAxisCellCount: 4,
-    totalImage: 6,
+    maincrossAxisCellCount: 5,
+    totalImage: 8,
     tiles: [
-      CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 3, imagePath: ''),
-      CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 3, imagePath: ''),
+      CollageTileData(imageId: 1, crossAxisCellCount: 2, mainAxisCellCount: 2, imagePath: ''),
+      CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
       CollageTileData(imageId: 3, crossAxisCellCount: 2, mainAxisCellCount: 2, imagePath: ''),
       CollageTileData(imageId: 4, crossAxisCellCount: 2, mainAxisCellCount: 2, imagePath: ''),
+      CollageTileData(imageId: 5, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
+      CollageTileData(imageId: 6, crossAxisCellCount: 2, mainAxisCellCount: 2, imagePath: ''),
+      CollageTileData(imageId: 7, crossAxisCellCount: 5, mainAxisCellCount: 1, imagePath: ''),
+    ],
+  ),
+  Collage(
+    id: 9,
+    maincrossAxisCellCount: 5,
+    totalImage: 6,
+    tiles: [
+      CollageTileData(imageId: 1, crossAxisCellCount: 3, mainAxisCellCount: 1, imagePath: ''),
+      CollageTileData(imageId: 2, crossAxisCellCount: 2, mainAxisCellCount: 3, imagePath: ''),
+      CollageTileData(imageId: 3, crossAxisCellCount: 3, mainAxisCellCount: 3, imagePath: ''),
+      CollageTileData(imageId: 4, crossAxisCellCount: 2, mainAxisCellCount: 1, imagePath: ''),
       CollageTileData(imageId: 5, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
-      CollageTileData(imageId: 6, crossAxisCellCount: 1, mainAxisCellCount: 1, imagePath: ''),
+      CollageTileData(imageId: 6, crossAxisCellCount: 4, mainAxisCellCount: 1, imagePath: ''),
+    ],
+  ),
+  Collage(
+    id: 10,
+    maincrossAxisCellCount: 5,
+    totalImage: 5,
+    tiles: [
+      CollageTileData(imageId: 1, crossAxisCellCount: 1, mainAxisCellCount: 5, imagePath: ''),
+      CollageTileData(imageId: 2, crossAxisCellCount: 3, mainAxisCellCount: 2, imagePath: ''),
+      CollageTileData(imageId: 3, crossAxisCellCount: 1, mainAxisCellCount: 5, imagePath: ''),
+      CollageTileData(imageId: 4, crossAxisCellCount: 3, mainAxisCellCount: 1, imagePath: ''),
+      CollageTileData(imageId: 5, crossAxisCellCount: 3, mainAxisCellCount: 2, imagePath: ''),
+    ],
+  ),
+  Collage(
+    id: 11,
+    maincrossAxisCellCount: 5,
+    totalImage: 6,
+    tiles: [
+      CollageTileData(imageId: 1, crossAxisCellCount: 2, mainAxisCellCount: 3, imagePath: ''),
+      CollageTileData(imageId: 2, crossAxisCellCount: 1, mainAxisCellCount: 2, imagePath: ''),
+      CollageTileData(imageId: 3, crossAxisCellCount: 2, mainAxisCellCount: 2, imagePath: ''),
+      CollageTileData(imageId: 4, crossAxisCellCount: 3, mainAxisCellCount: 1, imagePath: ''),
+      CollageTileData(imageId: 5, crossAxisCellCount: 3, mainAxisCellCount: 2, imagePath: ''),
+      CollageTileData(imageId: 6, crossAxisCellCount: 2, mainAxisCellCount: 2, imagePath: ''),
     ],
   ),
 ];

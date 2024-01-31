@@ -22,7 +22,7 @@ class CollageWidget {
             child: StaggeredGrid.count(
               // key: UniqueKey(),
               crossAxisCount: collageData.maincrossAxisCellCount,
-              axisDirection: AxisDirection.right,
+              axisDirection: AxisDirection.down,
               children: List.generate(
                 collageData.tiles.length,
                 (index) {
@@ -69,7 +69,7 @@ class CollageWidget {
           Padding(
             padding: const EdgeInsets.all(3),
             child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              borderRadius: BorderRadius.all(Radius.circular(isDisabled ? 3 : 5)),
               child: tiles.imagePath != '' && !isDisabled
                   ? Image.file(
                       File(tiles.imagePath),

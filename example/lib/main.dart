@@ -9,6 +9,7 @@ import 'package:screenshot/screenshot.dart';
 import 'package:test_package/collage/collage_show.dart';
 import 'package:test_package/cubit/collage_cubit_cubit.dart';
 import 'package:test_package/model/image_model.dart';
+import 'package:test_package/snack_bar.dart';
 
 void main() {
   BlocOverrides.runZoned(
@@ -16,6 +17,8 @@ void main() {
     blocObserver: AppBlocObserver(),
   );
 }
+
+final GlobalKey<ScaffoldMessengerState> snackbarKey = GlobalKey<ScaffoldMessengerState>();
 
 class AppBlocObserver extends BlocObserver {
   @override
@@ -38,6 +41,7 @@ class MyApp extends StatelessWidget {
       create: (context) => CollageCubit(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        scaffoldMessengerKey: snackbarKey,
         title: 'Task: 4',
         theme: ThemeData(
           primaryColor: Colors.blue,
@@ -59,7 +63,6 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   ScreenshotController screenshotController = ScreenshotController();
   late CollageCubit collageCubit;
-
   @override
   void initState() {
     collageCubit = BlocProvider.of<CollageCubit>(context);
@@ -108,31 +111,44 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await screenshotController.capture().then(
-            (value) async {
-              SnackBar snackBar;
-              if (value != null) {
-                var isDone = await ImageGallerySaver.saveImage(
-                  Uint8List.fromList(value),
-                  quality: 100,
+      floatingActionButton: BlocBuilder<CollageCubit, CollageCubitState>(
+        bloc: collageCubit,
+        builder: (context, state) {
+          if (state is ImageListState) {
+            return FloatingActionButton(
+              onPressed: () async {
+                await screenshotController.capture().then(
+                  (value) async {
+                    bool isEmptyImage = dummyData
+                        .where((element) => element.id == state.selectedCollageId)
+                        .first
+                        .tiles
+                        .every((element) => element.imagePath != '');
+                    if (isEmptyImage) {
+                      if (value != null) {
+                        var isDone = await ImageGallerySaver.saveImage(
+                          Uint8List.fromList(value),
+                          quality: 100,
+                        );
+                        if (isDone != null) {
+                          CustomSnackbar.show(snackbarType: SnackbarType.SUCCESS, message: 'File saved successfully');
+                        } else {
+                          CustomSnackbar.show(
+                              snackbarType: SnackbarType.SUCCESS, message: 'Can\'t save the file? Try again.');
+                        }
+                      }
+                    } else {
+                      CustomSnackbar.show(snackbarType: SnackbarType.ERROR, message: 'Uplaod All Image.');
+                    }
+                  },
                 );
-                if (isDone != null) {
-                  snackBar = const SnackBar(
-                    content: Text('File saved successfully'),
-                  );
-                } else {
-                  snackBar = const SnackBar(
-                    content: Text('Can\'t save the file? Try again.'),
-                  );
-                }
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              }
-            },
-          );
+              },
+              child: const Icon(Icons.save),
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
         },
-        child: const Icon(Icons.save),
       ),
     );
   }
@@ -192,7 +208,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             margin: const EdgeInsets.all(5),
             padding: EdgeInsets.all(state.selectedCollageId == collage.id ? 1 : 5),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(5),
               color: state.selectedCollageId == collage.id
                   ? Colors.black.withOpacity(0.8)
                   : Colors.grey.withOpacity(
